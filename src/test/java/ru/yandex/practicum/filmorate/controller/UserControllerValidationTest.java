@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import ru.yandex.practicum.filmorate.exception.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -75,22 +74,6 @@ class UserControllerValidationTest {
 
     }
 
-    @Test
-    public void AddTheSameFilm() {
-        final UserAlreadyExistException exception = assertThrows(
-                UserAlreadyExistException.class,
-                new Executable() {
-                    @Override
-                    public void execute() {
-                        userController.create(user);
-                        userController.create(user);
-                    }
-                });
-
-        assertEquals("Пользователь с электронной " +
-                "почтой some@email.com уже зарегистрирован.", exception.getMessage());
-
-    }
 
     @Test
     public void EmptyEmailTest() {

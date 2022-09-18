@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmAlreadyExistException;
+import ru.yandex.practicum.filmorate.exception.FilmUnknownException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -15,6 +15,7 @@ import java.util.HashMap;
 @RestController("/films")
 public class FilmController {
 
+    private static int idCounter = 0;
     private final HashMap<Integer, Film> films = new HashMap<>();
 
     @GetMapping(value = "/films")
@@ -28,11 +29,7 @@ public class FilmController {
         log.info("Создание (post) записи для фильма {}", film.getName());
 
         filmValidator(film);
-
-        if (films.containsKey(film.getId())) {
-            log.info("Film with id = {} already exists.", film.getId());
-            throw new FilmAlreadyExistException("Film with id = " + film.getId() + " already exists.");
-        }
+        film.setId(++idCounter);
         films.put(film.getId(), film);
         return film;
     }
@@ -41,6 +38,10 @@ public class FilmController {
     public Film put(@RequestBody Film film) {
 
         log.info("Редактирование (put) записи для фильма {}", film.getName());
+
+        if(!films.containsKey(film.getId())) {
+            throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
+        }
 
         filmValidator(film);
         films.put(film.getId(), film);
@@ -65,7 +66,7 @@ public class FilmController {
             throw new ValidationException("Выход фильма не может быть раньше 28.12.1895.");
         }
 
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() < 0) {
             log.info("Валидация не пройдена: продолжительность фильма отрицательна");
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         }

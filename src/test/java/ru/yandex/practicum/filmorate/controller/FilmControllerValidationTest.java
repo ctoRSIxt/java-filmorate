@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import ru.yandex.practicum.filmorate.exception.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,17 +30,17 @@ class FilmControllerValidationTest {
 
         film  = new Film(1, "Фильм"
                 , "Описание"
-                , Duration.ofMinutes(120)
+                , 120
                 , LocalDate.of(1999,12,1));
 
         film2  = new Film(2, "Фильм2"
                 , "Описание"
-                , Duration.ofMinutes(120)
+                , 120
                 , LocalDate.of(1999,12,1));
 
         filmEmptyName  = new Film(1, ""
                 , "Описание"
-                , Duration.ofMinutes(120)
+                , 120
                 , LocalDate.of(1999,12,1));
 
         filmLongDescription  = new Film(1, "Фильм"
@@ -61,17 +59,17 @@ class FilmControllerValidationTest {
                 "Поэтому авторы решили создать 'франшизу внутри франшизы' и все фильмы, " +
                 "которые выходили после 'Казино', стали развивать тему личных отношений и " +
                 "биографической истории персонажа в ущерб глобальным проектам агента Ноль Ноль Семь."
-                , Duration.ofMinutes(120)
+                , 120
                 , LocalDate.of(1999,12,1));
 
         filmTooOld  = new Film(1, "Фильм"
                 , "Описание"
-                , Duration.ofMinutes(120)
+                , 120
                 , LocalDate.of(1888,12,1));
 
         filmNegativeDuration  = new Film(1, "Фильм"
                 , "Описание"
-                , Duration.ofMinutes(-30)
+                , -30
                 , LocalDate.of(1999,12,1));
 
     }
@@ -91,21 +89,6 @@ class FilmControllerValidationTest {
 
     }
 
-    @Test
-    public void AddTheSameFilm() {
-        final FilmAlreadyExistException exception = assertThrows(
-                FilmAlreadyExistException.class,
-                new Executable() {
-                    @Override
-                    public void execute() {
-                        filmController.create(film);
-                        filmController.create(film);
-                    }
-                });
-
-        assertEquals("Film with id = 1 already exists.", exception.getMessage());
-
-    }
 
     @Test
     public void EmptyNameTest() {
