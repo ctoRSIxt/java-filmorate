@@ -37,7 +37,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping
+    @PutMapping(value = "/films")
     public Film put(@RequestBody Film film) {
 
         log.info("Редактирование (put) записи для фильма {}", film.getName());

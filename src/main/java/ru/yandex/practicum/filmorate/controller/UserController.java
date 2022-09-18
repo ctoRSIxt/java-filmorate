@@ -14,9 +14,10 @@ import java.util.HashMap;
 @Slf4j
 @RestController("/users")
 public class UserController {
+    private static int idCounter = 0;
     private final HashMap<Integer, User> users = new HashMap<>();
 
-    @GetMapping
+    @GetMapping(value = "/users")
     public Collection<User> findAll() {
         return users.values();
     }
@@ -28,10 +29,12 @@ public class UserController {
 
         userValidator(user);
 
-        if(users.containsKey(user.getId())) {
-            throw new UserAlreadyExistException("Пользователь с электронной почтой " +
-                    user.getEmail() + " уже зарегистрирован.");
-        }
+//        if(users.containsKey(user.getId())) {
+//            throw new UserAlreadyExistException("Пользователь с электронной почтой " +
+//                    user.getEmail() + " уже зарегистрирован.");
+//        }
+
+        user.setId(idCounter++);
         users.put(user.getId(), user);
         return user;
     }
@@ -47,6 +50,13 @@ public class UserController {
     }
 
     private void userValidator(User user) {
+
+//        if (user.getId() < 0) {
+//            log.info("Валидация не пройдена: id < 0");
+//            throw new ValidationException("id должно быть больше 0");
+//        }
+
+
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.info("Валидация не пройдена: email пуст или не содержит @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать @");
