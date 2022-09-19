@@ -10,12 +10,13 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController("/users")
 public class UserController {
-    private static int idCounter = 0;
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private static long idCounter = 0;
+    private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping(value = "/users")
     public Collection<User> findAll() {
@@ -27,7 +28,7 @@ public class UserController {
 
         log.info("Создание (post) записи для пользователя {}", user.getName());
 
-        userValidator(user);
+        validateUser(user);
 
         user.setId(++idCounter);
         users.put(user.getId(), user);
@@ -38,7 +39,7 @@ public class UserController {
     public User put(@RequestBody User user) {
 
         log.info("Редактирование (put) записи для пользователя {}", user.getName());
-        userValidator(user);
+        validateUser(user);
 
         if(!users.containsKey(user.getId())) {
             throw new UserUnknownException("Пользователь с id = " + user.getId() + " не известен.");
@@ -49,7 +50,7 @@ public class UserController {
         return user;
     }
 
-    private void userValidator(User user) {
+    private void validateUser(User user) {
 
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.info("Валидация не пройдена: email пуст или не содержит @");

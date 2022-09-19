@@ -10,13 +10,14 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController("/films")
 public class FilmController {
 
-    private static int idCounter = 0;
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private static long idCounter = 0;
+    private final Map<Long, Film> films = new HashMap<>();
 
     @GetMapping(value = "/films")
     public Collection<Film> findAll() {
@@ -28,7 +29,7 @@ public class FilmController {
 
         log.info("Создание (post) записи для фильма {}", film.getName());
 
-        filmValidator(film);
+        validateFilm(film);
         film.setId(++idCounter);
         films.put(film.getId(), film);
         return film;
@@ -43,12 +44,12 @@ public class FilmController {
             throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
         }
 
-        filmValidator(film);
+        validateFilm(film);
         films.put(film.getId(), film);
         return film;
     }
 
-    private void filmValidator(Film film) {
+    private void validateFilm(Film film) {
 
         if (film.getName().isBlank()) {
             log.info("Валидация не пройдена: пустое назание");
