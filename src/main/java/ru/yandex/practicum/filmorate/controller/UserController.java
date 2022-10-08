@@ -33,7 +33,13 @@ public class UserController {
 
     @GetMapping(value = "/users/{userId}")
     public User findById(@PathVariable long userId) {
-        return userStorage.getUserById(userId);
+
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new UserUnknownException("No user with id =" + userId);
+        }
+
+        return user;
     }
 
     @PostMapping(value = "/users")

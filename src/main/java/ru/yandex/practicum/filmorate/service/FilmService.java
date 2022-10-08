@@ -18,9 +18,9 @@ public class FilmService {
         film.getLikes().remove(user.getId());
     }
 
-    public List<Film> getTopFilmsByLikes(Collection<Film> films, int count) {
+    public List<Film> getTopFilmsByLikes(Collection<Film> films, long count) {
         return films.stream()
-                .sorted((f1, f2) -> f1.getLikes().size() - f2.getLikes().size())
+                .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
                 .limit(count)
                 .collect(Collectors.toList());
     }

@@ -45,7 +45,13 @@ public class FilmController {
 
     @GetMapping(value = "/films/{filmId}")
     public Film findById(@PathVariable long filmId) {
-        return filmStorage.getFilmById(filmId);
+
+        Film film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            throw new FilmUnknownException("No film with id =" + filmId);
+        }
+
+        return film;
     }
 
     @PostMapping(value = "/films")
@@ -89,8 +95,9 @@ public class FilmController {
         return film;
     }
 
-    @GetMapping(value = "/films/popular?count={count}")
-    List<Film> getTopFilmsByLikes(@RequestParam(defaultValue = "10") int count) {
+
+    @GetMapping(value = "/films/popular")
+    List<Film> getTopFilmsByLikes(@RequestParam(name = "count", required=false, defaultValue = "10") Long count) {
         return filmService.getTopFilmsByLikes(filmStorage.findAll(), count);
     }
 
