@@ -5,6 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +31,9 @@ class FilmControllerValidationTest {
     @BeforeEach
     public void TestFilms() {
 
-        filmController = new FilmController();
+        filmController = new FilmController(new InMemoryFilmStorage()
+                , new FilmService()
+                , new InMemoryUserStorage());
 
         film  = new Film(1, "Фильм"
                 , "Описание"
@@ -82,7 +89,7 @@ class FilmControllerValidationTest {
         assertEquals(2, filmController.findAll().size(), "Фильмы не добавляются");
 
         film2.setDescription("Описание2");
-        filmController.put(film2);
+        filmController.update(film2);
 
         List<Film> films = new ArrayList<>(filmController.findAll());
         assertEquals("Описание2", films.get(1).getDescription(), "Фильмы не обновляются");
