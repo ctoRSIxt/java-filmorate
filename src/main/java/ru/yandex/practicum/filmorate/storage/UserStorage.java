@@ -15,6 +15,9 @@ public interface UserStorage {
     // Return list of all users
     public Collection<User> findAll();
 
+    // Return user by id
+    public User getUserById(long id);
+
     // Create a new user
     public User create(User user);
 

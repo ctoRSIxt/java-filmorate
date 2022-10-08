@@ -26,6 +26,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Film getFilmById(long id) {
+        return films.get(id);
+    }
+
+    @Override
     public Film create(Film film) {
 
         log.info("Создание (post) записи для фильма {}", film.getName());

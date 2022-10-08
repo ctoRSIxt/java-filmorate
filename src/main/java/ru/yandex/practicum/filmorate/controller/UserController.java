@@ -2,76 +2,116 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserUnknownException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController("/users")
 public class UserController {
-    private static long idCounter = 0;
-    private final Map<Long, User> users = new HashMap<>();
+    private UserStorage userStorage;
+    private UserService userService;
+
+    @Autowired
+    public UserController(UserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
+        this.userService = userService;
+    }
 
     @GetMapping(value = "/users")
     public Collection<User> findAll() {
-        return users.values();
+        return userStorage.findAll();
+    }
+
+    @GetMapping(value = "/users/{userId}")
+    public User findById(@PathVariable long userId) {
+        return userStorage.getUserById(userId);
     }
 
     @PostMapping(value = "/users")
     public User create(@RequestBody User user) {
-
-        log.info("Создание (post) записи для пользователя {}", user.getName());
-
-        validateUser(user);
-
-        user.setId(++idCounter);
-        users.put(user.getId(), user);
-        return user;
+        return userStorage.create(user);
     }
 
     @PutMapping(value = "/users")
-    public User put(@RequestBody User user) {
+    public User update(@RequestBody User user) {
+        return userStorage.update(user);
+    }
 
-        log.info("Редактирование (put) записи для пользователя {}", user.getName());
-        validateUser(user);
+    @PutMapping(value = "/users/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable long id, @PathVariable long friendId) {
 
-        if(!users.containsKey(user.getId())) {
-            throw new UserUnknownException("Пользователь с id = " + user.getId() + " не известен.");
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id =" + id);
+        }
+        User userToAdd = userStorage.getUserById(friendId);
+        if (userToAdd == null) {
+            throw new UserUnknownException("No user with id =" + friendId);
         }
 
-        users.put(user.getId(), user);
-
+        userService.addToFriends(user,userToAdd);
         return user;
     }
 
-    private void validateUser(User user) {
+    @DeleteMapping(value = "/users/{id}/friends/{friendId}")
+    public User removeFromFriends(@PathVariable long id, @PathVariable long friendId) {
 
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.info("Валидация не пройдена: email пуст или не содержит @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать @");
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id =" + id);
+        }
+        User userToRemove = userStorage.getUserById(friendId);
+        if (userToRemove == null) {
+            throw new UserUnknownException("No user with id =" + friendId);
         }
 
-        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.info("Валидация не пройдена: логин пуст или содержит пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
-        }
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("Имя пользователя пустое: будет использоваться логин");
-            user.setName(user.getLogin());
-        }
-        LocalDate firstRelease = LocalDate.now();
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Валидация не пройдена: дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-
+        userService.removeFromFriends(user, userToRemove);
+        return user;
     }
+
+    @GetMapping(value = "/users/{id}/friends")
+    public List<User> getAllFriends(@PathVariable long id) {
+
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id =" + id);
+        }
+
+        List<User> friends = new ArrayList<>();
+        for (long friendId : userService.getAllFriends(user)) {
+            friends.add(userStorage.getUserById(friendId));
+        };
+        return friends;
+    }
+
+    @GetMapping(value = "/users/{id}/friends/common/{otherId}")
+    public List<User> getAllFriends(@PathVariable long id, @PathVariable long otherId) {
+
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id =" + id);
+        }
+
+        User otherUser = userStorage.getUserById(id);
+        if (otherUser == null) {
+            throw new UserUnknownException("No user with id =" + id);
+        }
+
+        List<User> mutualFriends = new ArrayList<>();
+        for (long friendId : userService.getMutualFriends(user, otherUser)) {
+            mutualFriends.add(userStorage.getUserById(friendId));
+        };
+        return mutualFriends;
+    }
+
 
 }

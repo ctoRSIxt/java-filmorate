@@ -23,6 +23,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User getUserById(long id) {
+        return users.get(id);
+    }
+
+    @Override
     public User create(User user) {
 
         log.info("Создание (post) записи для пользователя {}", user.getName());

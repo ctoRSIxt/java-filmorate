@@ -3,13 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 @Service
 public class UserService {
-
 
     public void addToFriends(User user, User userToAdd) {
         user.getFriendsId().add(userToAdd.getId());
@@ -20,6 +18,10 @@ public class UserService {
         user.getFriendsId().remove(userToRemove.getId());
         userToRemove.getFriendsId().remove(user.getId());
     };
+
+    public Collection<Long> getAllFriends(User user) {
+        return user.getFriendsId();
+    }
 
     public Collection<Long> getMutualFriends(User user1, User user2) {
         HashSet<Long> intersection = new HashSet<>(user1.getFriendsId());
