@@ -101,9 +101,9 @@ public class UserController {
             throw new UserUnknownException("No user with id =" + id);
         }
 
-        User otherUser = userStorage.getUserById(id);
+        User otherUser = userStorage.getUserById(otherId);
         if (otherUser == null) {
-            throw new UserUnknownException("No user with id =" + id);
+            throw new UserUnknownException("No user with id =" + otherId);
         }
 
         List<User> mutualFriends = new ArrayList<>();

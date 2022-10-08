@@ -11,17 +11,17 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    void addLike(Film film, User user) {
+    public void addLike(Film film, User user) {
         film.getLikes().add(user.getId());
     }
-    void removeLike(Film film, User user) {
+    public void removeLike(Film film, User user) {
         film.getLikes().remove(user.getId());
     }
 
-    List<Film> getTop10ByLikes(Collection<Film> films) {
+    public List<Film> getTopFilmsByLikes(Collection<Film> films, int count) {
         return films.stream()
                 .sorted((f1, f2) -> f1.getLikes().size() - f2.getLikes().size())
-                .limit(10)
+                .limit(count)
                 .collect(Collectors.toList());
     }
 
