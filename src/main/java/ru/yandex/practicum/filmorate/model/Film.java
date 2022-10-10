@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 
 @Data
-//@AllArgsConstructor
 public class Film {
     private long id;
     private String name;

@@ -31,7 +31,7 @@ class UserControllerValidationTest {
     public void TestUsers() {
 
 
-        userController = new UserController(new InMemoryUserStorage(), new UserService());
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
 
         user = new User(1, "some@email.com"
                 , "login", "Movie Fan"
