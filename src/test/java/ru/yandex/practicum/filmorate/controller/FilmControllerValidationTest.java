@@ -31,9 +31,8 @@ class FilmControllerValidationTest {
     @BeforeEach
     public void TestFilms() {
 
-        filmController = new FilmController(new InMemoryFilmStorage()
-                , new FilmService()
-                , new InMemoryUserStorage());
+        filmController = new FilmController(
+                new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
         film  = new Film(1, "Фильм"
                 , "Описание"
