@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @Slf4j
@@ -21,8 +19,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
     @Override
-    public Collection<Film> findAll() {
-        return films.values();
+    public List<Film> findAll() {
+        return new ArrayList<>(films.values());
     }
 
     @Override
@@ -58,23 +56,23 @@ public class InMemoryFilmStorage implements FilmStorage {
     private void validateFilm(Film film) {
 
         if (film.getName().isBlank()) {
-            log.info("Валидация не пройдена: пустое назание");
+            log.info("Film: Валидация не пройдена: пустое назание");
             throw new ValidationException("Название не может быть пустым.");
         }
 
         if (film.getDescription().length() > 200) {
-            log.info("Валидация не пройдена: описание длиннее 200 символов");
+            log.info("Film: Валидация не пройдена: описание длиннее 200 символов");
             throw new ValidationException("Максимальная длина описание 200 символов.");
         }
 
         LocalDate firstRelease = LocalDate.of(1895,12,28);
         if (film.getReleaseDate().isBefore(firstRelease)) {
-            log.info("Валидация не пройдена: дата релиза раньше 28.12.1895");
+            log.info("Film: Валидация не пройдена: дата релиза раньше 28.12.1895");
             throw new ValidationException("Выход фильма не может быть раньше 28.12.1895.");
         }
 
         if (film.getDuration() < 0) {
-            log.info("Валидация не пройдена: продолжительность фильма отрицательна");
+            log.info("Film: Валидация не пройдена: продолжительность фильма отрицательна");
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         }
     }

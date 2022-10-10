@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -12,7 +13,7 @@ public class Film {
     private String description;
     private int duration;
     private LocalDate releaseDate;
-    private HashSet<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
 
     public Film(long id, String name, String description, int duration, LocalDate releaseDate) {
         this.id = id;

@@ -6,26 +6,21 @@ import ru.yandex.practicum.filmorate.exception.UserUnknownException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
     private UserStorage userStorage;
-
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         return userStorage.findAll();
     }
-
 
     public User findById(long userId) {
 
@@ -78,20 +73,16 @@ public class UserService {
         return user;
     }
 
-
     public List<User> getAllFriends(long id) {
         User user = userStorage.getUserById(id);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + id);
         }
 
-        List<User> friends = new ArrayList<>();
-        for (long friendId : user.getFriendsId()) {
-            friends.add(userStorage.getUserById(friendId));
-        };
-        return friends;
+        return user.getFriendsId().stream()
+                .map(friendId -> userStorage.getUserById(friendId))
+                .collect(Collectors.toList());
     }
-
 
     public List<User> getCommonFriends(long id, long otherId) {
 
@@ -105,16 +96,10 @@ public class UserService {
             throw new UserUnknownException("No user with id =" + otherId);
         }
 
-        List<User> commonFriends = new ArrayList<>();
-
         HashSet<Long> intersection = new HashSet<>(user.getFriendsId());
         intersection.retainAll(otherUser.getFriendsId());
-
-        for (long friendId : intersection) {
-            commonFriends.add(userStorage.getUserById(friendId));
-        };
-        return commonFriends;
+        return intersection.stream()
+                .map(friendId -> userStorage.getUserById(friendId))
+                .collect(Collectors.toList());
     }
-
-
 }
