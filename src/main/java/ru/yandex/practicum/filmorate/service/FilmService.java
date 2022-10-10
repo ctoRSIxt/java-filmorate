@@ -24,7 +24,6 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-
     public List<Film> findAll() {
         return filmStorage.findAll();
     }
@@ -47,12 +46,11 @@ public class FilmService {
         return filmStorage.update(film);
     }
 
-
     public Film addLike(long id, long userId) {
 
         Film film = filmStorage.getFilmById(id);
         if (film == null) {
-            throw  new FilmUnknownException("No film with id =" + id);
+            throw new FilmUnknownException("No film with id =" + id);
         }
 
         User user = userStorage.getUserById(userId);
@@ -63,7 +61,6 @@ public class FilmService {
         film.getLikes().add(user.getId());
         return film;
     }
-
 
     public Film removeLike(long id, long userId) {
         Film film = filmStorage.getFilmById(id);
@@ -80,14 +77,12 @@ public class FilmService {
         return film;
     }
 
-
     public List<Film> getTopFilmsByLikes(long count) {
         return filmStorage.findAll().stream()
                 .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
                 .limit(count)
                 .collect(Collectors.toList());
     }
-
 }
 
 

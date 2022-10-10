@@ -6,10 +6,8 @@ import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,29 +25,28 @@ class FilmControllerValidationTest {
     Film filmTooOld;
     Film filmNegativeDuration;
 
-
     @BeforeEach
     public void TestFilms() {
 
         filmController = new FilmController(
                 new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
-        film  = new Film(1, "Фильм"
+        film = new Film(1, "Фильм"
                 , "Описание"
                 , 120
-                , LocalDate.of(1999,12,1));
+                , LocalDate.of(1999, 12, 1));
 
-        film2  = new Film(2, "Фильм2"
+        film2 = new Film(2, "Фильм2"
                 , "Описание"
                 , 120
-                , LocalDate.of(1999,12,1));
+                , LocalDate.of(1999, 12, 1));
 
-        filmEmptyName  = new Film(1, ""
+        filmEmptyName = new Film(1, ""
                 , "Описание"
                 , 120
-                , LocalDate.of(1999,12,1));
+                , LocalDate.of(1999, 12, 1));
 
-        filmLongDescription  = new Film(1, "Фильм"
+        filmLongDescription = new Film(1, "Фильм"
                 , "Посмотрев 20 полнометражных фильмов " +
                 "о приключениях Джеймса Бонда мы поняли одно: " +
                 "у Джеймса Бонда есть всего две настоящих страсти " +
@@ -66,17 +63,17 @@ class FilmControllerValidationTest {
                 "которые выходили после 'Казино', стали развивать тему личных отношений и " +
                 "биографической истории персонажа в ущерб глобальным проектам агента Ноль Ноль Семь."
                 , 120
-                , LocalDate.of(1999,12,1));
+                , LocalDate.of(1999, 12, 1));
 
-        filmTooOld  = new Film(1, "Фильм"
+        filmTooOld = new Film(1, "Фильм"
                 , "Описание"
                 , 120
-                , LocalDate.of(1888,12,1));
+                , LocalDate.of(1888, 12, 1));
 
-        filmNegativeDuration  = new Film(1, "Фильм"
+        filmNegativeDuration = new Film(1, "Фильм"
                 , "Описание"
                 , -30
-                , LocalDate.of(1999,12,1));
+                , LocalDate.of(1999, 12, 1));
 
     }
 

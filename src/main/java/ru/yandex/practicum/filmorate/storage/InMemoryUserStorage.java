@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Редактирование (put) записи для пользователя {}", user.getName());
         validateUser(user);
 
-        if(!users.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             throw new UserUnknownException("Пользователь с id = " + user.getId() + " не известен.");
         }
 
@@ -72,11 +72,9 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
         }
 
-
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.info("User: Валидация не пройдена: дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-
     }
 }

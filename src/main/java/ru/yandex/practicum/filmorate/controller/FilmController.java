@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import java.util.*;
 @Slf4j
 @RestController("/films")
 public class FilmController {
-
     private FilmService filmService;
 
     @Autowired
@@ -50,13 +48,8 @@ public class FilmController {
         return filmService.removeLike(id, userId);
     }
 
-
     @GetMapping(value = "/films/popular")
-    List<Film> getTopFilmsByLikes(@RequestParam(name = "count", required=false, defaultValue = "10") Long count) {
+    List<Film> getTopFilmsByLikes(@RequestParam(name = "count", required = false, defaultValue = "10") Long count) {
         return filmService.getTopFilmsByLikes(count);
     }
-
-
-
-
 }

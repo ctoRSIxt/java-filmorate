@@ -44,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         log.info("Редактирование (put) записи для фильма {}", film.getName());
 
-        if(!films.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {
             throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
         }
 
@@ -65,7 +65,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("Максимальная длина описание 200 символов.");
         }
 
-        LocalDate firstRelease = LocalDate.of(1895,12,28);
+        LocalDate firstRelease = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(firstRelease)) {
             log.info("Film: Валидация не пройдена: дата релиза раньше 28.12.1895");
             throw new ValidationException("Выход фильма не может быть раньше 28.12.1895.");

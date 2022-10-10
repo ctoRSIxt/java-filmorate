@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,7 +30,4 @@ public class ErrorHandler {
     public Map<String, String> handleOtherExceptions(final Throwable e) {
         return Map.of("Unexpected error", e.getMessage());
     }
-
-
-
 }
