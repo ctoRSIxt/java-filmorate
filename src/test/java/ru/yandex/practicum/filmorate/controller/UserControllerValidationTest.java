@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,35 +29,35 @@ class UserControllerValidationTest {
     @BeforeEach
     public void TestUsers() {
 
-        userController = new UserController();
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
 
         user = new User(1, "some@email.com"
                 , "login", "Movie Fan"
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         user2 = new User(2, "some@email.com"
                 , "login2", "Movie Fan2"
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         userEmptyEmail = new User(1, "  "
                 , "login", "Movie Fan"
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         userNoAtEmail = new User(1, "someemail.com"
                 , "login", "Movie Fan"
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         userLoginWithSpace = new User(1, "some@email.com"
                 , "login login", "Movie Fan"
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         userEmptyName = new User(1, "some@email.com"
                 , "login", ""
-                , LocalDate.of(2000,10,1));
+                , LocalDate.of(2000, 10, 1));
 
         userTooYoung = new User(1, "some@email.com"
                 , "login", ""
-                , LocalDate.of(2030,10,1));
+                , LocalDate.of(2030, 10, 1));
     }
 
 
@@ -67,7 +69,7 @@ class UserControllerValidationTest {
         assertEquals(2, userController.findAll().size(), "Пользователи не добавляются");
 
         user2.setLogin("LOGIN222");
-        userController.put(user2);
+        userController.update(user2);
 
         List<User> users = new ArrayList<>(userController.findAll());
         assertEquals("LOGIN222", users.get(1).getLogin(), "Пользователи не обновляются");
