@@ -2,18 +2,19 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmUnknownException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -63,6 +64,54 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
+    private void updateGenres(Film film) {
+
+        // Inserts if genre_name doesn't exist
+        String sqlPutGenre = "insert into genres (genre_name)" +
+                "select ?" +
+                "where not exists (select 1 from genres where genre_name = ?";
+
+        for (String genre : film.getGenre()) {
+            jdbcTemplate.update(sqlPutGenre,genre, genre);
+        }
+    }
+
+    private void updateFilmGenres(Film film) {
+
+        // Get genre_name to genre_id map
+        String sqlGetGenre = "select * from genres";
+        SqlRowSet genreRows = jdbcTemplate.queryForRowSet(sqlGetGenre);
+        Map<String, Integer> genreMap = new HashMap<>();
+        if(genreRows.next()) {
+            genreMap.put(genreRows.getString("genre_name")
+                    , genreRows.getInt("genre_id"));
+        }
+
+        // Update film_genres
+        String sqlInsFilmGenres = "insert into film_genres(film_id, genre_id)" +
+                                  "select ?, ?" +
+        "where not exists (select 1 from film_genres where film_id = ? and genre_id = ?)";
+
+        for (String genre : film.getGenre()) {
+            jdbcTemplate.update(sqlInsFilmGenres
+                    , film.getId(), genreMap.get(genre), film.getId(), genreMap.get(genre));
+        }
+
+    }
+
+    private void updateFilmLikes(Film film) {
+        String sqlInsFilmLikes = "insert into film_likes(film_id, user_id)" +
+                "select ?, ?" +
+                "where not exists (select 1 from film_likes where film_id = ? and user_id = ?)";
+
+        for (Long userID : film.getLikes()) {
+            jdbcTemplate.update(sqlInsFilmLikes
+                    , film.getId(), userID, film.getId(), userID);
+        }
+
+    }
+
+
 
     @Override
     public List<Film> findAll() {
@@ -75,7 +124,6 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "select * from films where film_id = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
 
-        // обрабатываем результат выполнения запроса
         if(filmRows.next()) {
             Film film = new Film(filmRows.getLong("film_id")
                     ,filmRows.getString("title")
@@ -99,22 +147,58 @@ public class FilmDbStorage implements FilmStorage {
 
         validateFilm(film);
 
-        validateFilm(film);
-        film.setId(++idCounter);
-        films.put(film.getId(), film);
-        return film;
+        String sqlFilms = "insert into films(title, description, duration, release_date, rating) " +
+                "values (?, ?, ?, ?, ?)";
 
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlFilms, new String[]{"film_id"});
+            stmt.setString(1, film.getTitle());
+            stmt.setString(2, film.getDescription());
+            stmt.setInt(3, film.getDuration());
+            stmt.setDate(4, java.sql.Date.valueOf(film.getReleaseDate()));
+            stmt.setString(5, film.getRating());
+            return stmt;
+        }, keyHolder);
+        film.setId(keyHolder.getKey().longValue());
+
+        updateGenres(film);
+        updateFilmGenres(film);
+        updateFilmLikes(film);
+
+        return film;
     };
 
     @Override
     public Film update(Film film) {
 
-        if (!films.containsKey(film.getId())) {
+        validateFilm(film);
+
+        String sql = "select * from films where film_id = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, film.getId());
+
+        if (!filmRows.next()) {
             throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
         }
 
-        validateFilm(film);
-        films.put(film.getId(), film);
+
+        String sqlFilmUpdate = "update films set " +
+                "title = ?, description = ?, duration = ?, " +
+                "release_date = ?, rating = ?" +
+                "where id = ?";
+        jdbcTemplate.update(sqlFilmUpdate
+                , film.getTitle()
+                , film.getDescription()
+                , film.getDuration()
+                , java.sql.Date.valueOf(film.getReleaseDate())
+                , film.getRating());
+
+        updateGenres(film);
+        updateFilmGenres(film);
+        updateFilmLikes(film);
+
+
         return film;
 
     };
