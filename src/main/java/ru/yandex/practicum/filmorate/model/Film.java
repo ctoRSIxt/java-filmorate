@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 public class Film {
     private long id;
-    private String title;
+    private String name;
     private String description;
     private int duration;
     private LocalDate releaseDate;
@@ -19,13 +19,16 @@ public class Film {
     private List<String> genre = new ArrayList<>();
     private Set<Long> likes = new HashSet<>();
 
-    public Film(long id, String title, String description
-            , int duration, LocalDate releaseDate, String rating) {
+
+    public Film(long id, String name, String description, int duration
+            , LocalDate releaseDate, String rating) {
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.description = description;
         this.duration = duration;
         this.releaseDate = releaseDate;
         this.rating = rating;
     }
+
+
 }

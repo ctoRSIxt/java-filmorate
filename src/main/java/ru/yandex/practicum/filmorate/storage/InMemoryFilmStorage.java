@@ -31,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
 
-        log.info("Создание (post) записи для фильма {}", film.getTitle());
+        log.info("Создание (post) записи для фильма {}", film.getName());
 
         validateFilm(film);
         film.setId(++idCounter);
@@ -42,7 +42,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
 
-        log.info("Редактирование (put) записи для фильма {}", film.getTitle());
+        log.info("Редактирование (put) записи для фильма {}", film.getName());
 
         if (!films.containsKey(film.getId())) {
             throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
@@ -55,7 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private void validateFilm(Film film) {
 
-        if (film.getTitle().isBlank()) {
+        if (film.getName().isBlank()) {
             log.info("Film: Валидация не пройдена: пустое назание");
             throw new ValidationException("Название не может быть пустым.");
         }

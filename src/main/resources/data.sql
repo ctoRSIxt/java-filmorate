@@ -1,4 +1,4 @@
-INSERT INTO films (title, description, duration, release_date, rating)
+INSERT INTO films (name, description, duration, release_date, rating)
 VALUES
     ('The Godfather','The aging patriarch...',175,'1972-01-01','R'),
     ('Pulp Fiction','The lives of two mob...',154,'1994-01-01','R'),

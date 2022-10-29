@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private Film queryFilm(ResultSet rs) throws SQLException {
         Film film = new Film(rs.getLong("film_id")
-                        ,rs.getString("title")
+                        ,rs.getString("name")
                         ,rs.getString("description")
                         ,rs.getInt("duration")
                         ,rs.getDate("release_date").toLocalDate()
@@ -128,7 +128,7 @@ public class FilmDbStorage implements FilmStorage {
 
         if(filmRows.next()) {
             Film film = new Film(filmRows.getLong("film_id")
-                    ,filmRows.getString("title")
+                    ,filmRows.getString("name")
                     ,filmRows.getString("description")
                     ,filmRows.getInt("duration")
                     ,filmRows.getDate("release_date").toLocalDate()
@@ -149,14 +149,14 @@ public class FilmDbStorage implements FilmStorage {
 
         validateFilm(film);
 
-        String sqlFilms = "insert into films(title, description, duration, release_date, rating) " +
+        String sqlFilms = "insert into films(name, description, duration, release_date, rating) " +
                 "values (?, ?, ?, ?, ?)";
 
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlFilms, new String[]{"film_id"});
-            stmt.setString(1, film.getTitle());
+            stmt.setString(1, film.getName());
             stmt.setString(2, film.getDescription());
             stmt.setInt(3, film.getDuration());
             stmt.setDate(4, java.sql.Date.valueOf(film.getReleaseDate()));
@@ -186,15 +186,16 @@ public class FilmDbStorage implements FilmStorage {
 
 
         String sqlFilmUpdate = "update films set " +
-                "title = ?, description = ?, duration = ?, " +
+                "name = ?, description = ?, duration = ?, " +
                 "release_date = ?, rating = ?" +
-                "where id = ?";
+                "where film_id = ?";
         jdbcTemplate.update(sqlFilmUpdate
-                , film.getTitle()
+                , film.getName()
                 , film.getDescription()
                 , film.getDuration()
                 , java.sql.Date.valueOf(film.getReleaseDate())
-                , film.getRating());
+                , film.getRating()
+                , film.getId());
 
         updateGenres(film);
         updateFilmGenres(film);
@@ -208,7 +209,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private void validateFilm(Film film) {
 
-        if (film.getTitle().isBlank()) {
+        if (film.getName().isBlank()) {
             log.info("Film: Валидация не пройдена: пустое назание");
             throw new ValidationException("Название не может быть пустым.");
         }

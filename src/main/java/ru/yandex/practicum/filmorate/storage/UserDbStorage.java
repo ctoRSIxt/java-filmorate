@@ -139,12 +139,13 @@ public class UserDbStorage implements UserStorage {
 
         String sqlUserUpdate = "update users set " +
                 "email = ?, login = ?, name = ?, " +
-                "birthday = ? where id = ?";
+                "birthday = ? where user_id = ?";
         jdbcTemplate.update(sqlUserUpdate
                 , user.getEmail()
                 , user.getLogin()
                 , user.getName()
-                , java.sql.Date.valueOf(user.getBirthday()));
+                , java.sql.Date.valueOf(user.getBirthday())
+                , user.getId());
 
         updateFriends(user);
         return user;
