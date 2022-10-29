@@ -59,6 +59,7 @@ public class FilmService {
         }
 
         film.getLikes().add(user.getId());
+        filmStorage.update(film);
         return film;
     }
 
@@ -74,6 +75,7 @@ public class FilmService {
         }
 
         film.getLikes().remove(user.getId());
+        filmStorage.update(film);
         return film;
     }
 

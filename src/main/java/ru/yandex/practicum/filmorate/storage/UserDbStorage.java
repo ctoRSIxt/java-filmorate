@@ -50,7 +50,7 @@ public class UserDbStorage implements UserStorage {
         SqlRowSet friendsRows = jdbcTemplate.queryForRowSet(sql, user_id);
 
         Map<Long, Boolean> friends = new HashMap<>();
-        if(friendsRows.next()) {
+        while (friendsRows.next()) {
             friends.put(friendsRows.getLong("friend_id"),
                         friendsRows.getBoolean("accepted"));
         }
@@ -70,6 +70,17 @@ public class UserDbStorage implements UserStorage {
                     ,userId, friendId, ac
                     ,userId, friendId);
         }
+
+        for (Long dbFriend : getFriends(user.getId()).keySet()) {
+            if (!user.getFriends().containsKey(dbFriend)) {
+                removeFriend(user.getId(), dbFriend);
+            }
+        }
+    }
+
+    private void removeFriend(Long userId, Long friendId) {
+        String sqlRemFriends = "delete from user_friendship where user_id = ? and friend_id = ?";
+        jdbcTemplate.update(sqlRemFriends, userId, friendId);
     }
 
     @Override
@@ -150,6 +161,7 @@ public class UserDbStorage implements UserStorage {
         updateFriends(user);
         return user;
     };
+
 
 
     private void validateUser(User user) {

@@ -106,11 +106,23 @@ public class FilmDbStorage implements FilmStorage {
                 "select ?, ?" +
                 "where not exists (select 1 from film_likes where film_id = ? and user_id = ?)";
 
-        for (Long userID : film.getLikes()) {
+        for (Long userId : film.getLikes()) {
             jdbcTemplate.update(sqlInsFilmLikes
-                    , film.getId(), userID, film.getId(), userID);
+                    , film.getId(), userId, film.getId(), userId);
         }
 
+
+        for (Long userId : getLikes(film.getId())) {
+            if (!film.getLikes().contains(userId)) {
+                removeLike(film.getId(), userId);
+            }
+        }
+
+    }
+
+    private void removeLike(Long filmId, Long userId) {
+        String sqlRemLike = "delete from film_likes where film_id = ? and user_id = ?";
+        jdbcTemplate.update(sqlRemLike, filmId, userId);
     }
 
 

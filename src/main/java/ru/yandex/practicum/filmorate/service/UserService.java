@@ -53,6 +53,10 @@ public class UserService {
         }
 
         user.getFriends().put(userToAdd.getId(), false);
+        userStorage.update(user);
+
+        userToAdd.getFriends().put(user.getId(), false);
+        userStorage.update(userToAdd);
 
         return user;
     }
@@ -69,7 +73,9 @@ public class UserService {
         }
 
         user.getFriends().remove(userToRemove.getId());
+        userStorage.update(user);
         userToRemove.getFriends().remove(user.getId());
+        userStorage.update(user);
         return user;
     }
 
