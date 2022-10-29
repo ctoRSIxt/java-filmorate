@@ -52,8 +52,7 @@ public class UserService {
             throw new UserUnknownException("No user with id =" + friendId);
         }
 
-        user.getFriendsId().add(userToAdd.getId());
-        userToAdd.getFriendsId().add(user.getId());
+        user.getFriends().put(userToAdd.getId(), false);
 
         return user;
     }
@@ -69,8 +68,8 @@ public class UserService {
             throw new UserUnknownException("No user with id =" + friendId);
         }
 
-        user.getFriendsId().remove(userToRemove.getId());
-        userToRemove.getFriendsId().remove(user.getId());
+        user.getFriends().remove(userToRemove.getId());
+        userToRemove.getFriends().remove(user.getId());
         return user;
     }
 
@@ -80,7 +79,7 @@ public class UserService {
             throw new UserUnknownException("No user with id =" + id);
         }
 
-        return user.getFriendsId().stream()
+        return user.getFriends().keySet().stream()
                 .map(friendId -> userStorage.getUserById(friendId))
                 .collect(Collectors.toList());
     }
@@ -97,8 +96,8 @@ public class UserService {
             throw new UserUnknownException("No user with id =" + otherId);
         }
 
-        HashSet<Long> intersection = new HashSet<>(user.getFriendsId());
-        intersection.retainAll(otherUser.getFriendsId());
+        HashSet<Long> intersection = new HashSet<>(user.getFriends().keySet());
+        intersection.retainAll(otherUser.getFriends().keySet());
         return intersection.stream()
                 .map(friendId -> userStorage.getUserById(friendId))
                 .collect(Collectors.toList());

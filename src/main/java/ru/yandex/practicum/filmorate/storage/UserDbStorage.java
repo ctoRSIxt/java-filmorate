@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("UserDbStorage")
+@Primary
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
