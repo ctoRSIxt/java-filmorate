@@ -55,9 +55,6 @@ public class UserService {
         user.getFriends().put(userToAdd.getId(), false);
         userStorage.update(user);
 
-        userToAdd.getFriends().put(user.getId(), false);
-        userStorage.update(userToAdd);
-
         return user;
     }
 
