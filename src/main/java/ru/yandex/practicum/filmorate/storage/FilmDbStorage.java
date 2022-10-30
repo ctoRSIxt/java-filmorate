@@ -101,43 +101,21 @@ public class FilmDbStorage implements FilmStorage {
 
 
     private void updateFilmGenres(Film film) {
-
-//        insert into film_genres(film_id, genre_id)
-//        select 2, 2
-//        where not exists (select 1 from film_genres where film_id = 2 and genre_id = 2);
-
         String sqlRemFilmGenres = "delete from film_genres where film_id = ?";
         jdbcTemplate.update(sqlRemFilmGenres, film.getId());
 
-//        String sqlInsFilmGenres = "update film_genres SET genre_id = ? where film_id = ?;" +
-//                "insert into film_genres(film_id, genre_id)" +
-//                "select ?, ?" +
-//                "where not exists (select 1 from film_genres where film_id = ? and genre_id = ?)";
-//        String sqlInsFilmGenres = "insert into film_genres(film_id, genre_id) values (?, ?)" ;
         String sqlInsFilmGenres = "insert into film_genres(film_id, genre_id)" +
                 "select ?, ?" +
                 "where not exists (select 1 from film_genres where film_id = ? and genre_id = ?)";
 
-
-        log.info(String.format("updateFilmGenres: Want to insert film_id = %d", film.getId()));
-
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
-                log.info(String.format("updateFilmGenres: Inserting film_id = %d, genre_id = %d"
-                        , film.getId(), genre.getId()));
                 jdbcTemplate.update(sqlInsFilmGenres
                         , film.getId(), genre.getId()
                         , film.getId(), genre.getId());
             }
         }
-
         film.setGenres(getGenres(film.getId()));
-
-//        if (film.getGenres() != null) {
-//            for (Genre genre : film.getGenres()) {
-//                genre = genreStorage.findById(genre.getId());
-//            }
-//        }
     }
 
     private void updateMpa(Film film) {
@@ -145,17 +123,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateFilmMpas(Film film) {
-
         if (film.getMpa() == null) return;
 
         String sqlInsFilmMpas = "update film_mpas SET mpa_id = ? where film_id = ?;"+
                 "insert into film_mpas(film_id, mpa_id)" +
                 "select ?, ?" +
                 "where not exists (select 1 from film_mpas where film_id = ? and mpa_id = ?)";
-
-//        String sqlInsFilmMpas = "insert into film_mpas(film_id, mpa_id)" +
-//                "select ?, ?" +
-//                "where not exists (select 1 from film_mpas where film_id = ? and mpa_id = ?)";
 
         jdbcTemplate.update(sqlInsFilmMpas
                 , film.getMpa().getId(), film.getId()

@@ -7,10 +7,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmUnknownException;
 import ru.yandex.practicum.filmorate.exception.UserUnknownException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
@@ -32,7 +30,6 @@ public class UserDbStorage implements UserStorage {
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
 
     private User queryUser(ResultSet rs) throws SQLException {
         User user = new User(rs.getLong("user_id")
