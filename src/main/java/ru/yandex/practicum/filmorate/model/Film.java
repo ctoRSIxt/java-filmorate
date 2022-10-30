@@ -15,9 +15,21 @@ public class Film {
     private String description;
     private int duration;
     private LocalDate releaseDate;
-    private List<Genre> genre = new ArrayList<>();
     private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
     private Set<Long> likes = new HashSet<>();
+
+    public Film(long id, String name, String description, int duration
+            , LocalDate releaseDate, Mpa mpa, List<Genre> genres, Set<Long> likes) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.duration = duration;
+        this.releaseDate = releaseDate;
+        this.mpa = mpa;
+        this.genres = genres;
+        this.likes = likes;
+    }
 
 
 //    public Film(long id, String name, String description, int duration
@@ -30,16 +42,16 @@ public class Film {
 //    }
 
 
-    public Film(long id, String name, String description, int duration
-            , LocalDate releaseDate, Mpa mpa) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
-        this.releaseDate = releaseDate;
-        this.mpa = mpa;
-//        this.genre = genre;
+//    public Film(long id, String name, String description, int duration
+//            , LocalDate releaseDate, Mpa mpa, List<Genre> genre, Set<Long> likes) {
+//        this.id = id;
+//        this.name = name;
+//        this.description = description;
+//        this.duration = duration;
+//        this.releaseDate = releaseDate;
 //        this.mpa = mpa;
-//        this.likes = likes;
-    }
+////        this.genre = genre;
+////        this.mpa = mpa;
+////        this.likes = likes;
+//    }
 }
