@@ -11,7 +11,7 @@ public interface FilmStorage {
     public List<Film> findAll();
 
     // Return film by id
-    public Film getFilmById(long id);
+    public Film findFilmById(long id);
 
     // Create a new film
     public Film create(Film film);

@@ -175,7 +175,7 @@ public class FilmDbStorage implements FilmStorage {
     };
 
     @Override
-    public Film getFilmById(long id) {
+    public Film findFilmById(long id) {
         String sql = "select * from films where film_id = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
 

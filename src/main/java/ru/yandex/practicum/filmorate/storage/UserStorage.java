@@ -10,7 +10,7 @@ public interface UserStorage {
     public List<User> findAll();
 
     // Return user by id
-    public User getUserById(long id);
+    public User findUserById(long id);
 
     // Create a new user
     public User create(User user);

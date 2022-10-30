@@ -57,7 +57,10 @@ public class GenreDbStorage implements GenreStorage {
             stmt.setString(2, genre.getName());
             return stmt;
         }, keyHolder);
-        genre.setId(keyHolder.getKey().longValue());
+
+        if (keyHolder.getKey() != null) {
+            genre.setId(keyHolder.getKey().longValue());
+        }
         return genre;
     }
 

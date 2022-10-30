@@ -30,7 +30,7 @@ public class FilmService {
 
     public Film findById(long filmId) {
 
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.findFilmById(filmId);
         if (film == null) {
             throw new FilmUnknownException("No film with id =" + filmId);
         }
@@ -48,12 +48,12 @@ public class FilmService {
 
     public Film addLike(long id, long userId) {
 
-        Film film = filmStorage.getFilmById(id);
+        Film film = filmStorage.findFilmById(id);
         if (film == null) {
             throw new FilmUnknownException("No film with id =" + id);
         }
 
-        User user = userStorage.getUserById(userId);
+        User user = userStorage.findUserById(userId);
         if (user == null) {
             throw new UserUnknownException("No user with id = " + userId);
         }
@@ -64,12 +64,12 @@ public class FilmService {
     }
 
     public Film removeLike(long id, long userId) {
-        Film film = filmStorage.getFilmById(id);
+        Film film = filmStorage.findFilmById(id);
         if (film == null) {
             throw new FilmUnknownException("No film with id = " + id);
         }
 
-        User user = userStorage.getUserById(userId);
+        User user = userStorage.findUserById(userId);
         if (user == null) {
             throw new UserUnknownException("No user with id = " + userId);
         }

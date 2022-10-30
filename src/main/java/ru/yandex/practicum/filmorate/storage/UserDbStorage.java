@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +87,7 @@ public class UserDbStorage implements UserStorage {
 
 
     @Override
-    public User getUserById(long id) {
+    public User findUserById(long id) {
 
         String sql = "select * from users where user_id = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, id);

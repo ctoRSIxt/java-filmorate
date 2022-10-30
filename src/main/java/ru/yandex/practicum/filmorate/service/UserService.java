@@ -25,7 +25,7 @@ public class UserService {
 
     public User findById(long userId) {
 
-        User user = userStorage.getUserById(userId);
+        User user = userStorage.findUserById(userId);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + userId);
         }
@@ -43,11 +43,11 @@ public class UserService {
 
     public User addFriend(long id, long friendId) {
 
-        User user = userStorage.getUserById(id);
+        User user = userStorage.findUserById(id);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + id);
         }
-        User userToAdd = userStorage.getUserById(friendId);
+        User userToAdd = userStorage.findUserById(friendId);
         if (userToAdd == null) {
             throw new UserUnknownException("No user with id =" + friendId);
         }
@@ -60,11 +60,11 @@ public class UserService {
 
     public User removeFromFriends(long id, long friendId) {
 
-        User user = userStorage.getUserById(id);
+        User user = userStorage.findUserById(id);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + id);
         }
-        User userToRemove = userStorage.getUserById(friendId);
+        User userToRemove = userStorage.findUserById(friendId);
         if (userToRemove == null) {
             throw new UserUnknownException("No user with id =" + friendId);
         }
@@ -77,24 +77,24 @@ public class UserService {
     }
 
     public List<User> getAllFriends(long id) {
-        User user = userStorage.getUserById(id);
+        User user = userStorage.findUserById(id);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + id);
         }
 
         return user.getFriends().keySet().stream()
-                .map(friendId -> userStorage.getUserById(friendId))
+                .map(friendId -> userStorage.findUserById(friendId))
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long id, long otherId) {
 
-        User user = userStorage.getUserById(id);
+        User user = userStorage.findUserById(id);
         if (user == null) {
             throw new UserUnknownException("No user with id =" + id);
         }
 
-        User otherUser = userStorage.getUserById(otherId);
+        User otherUser = userStorage.findUserById(otherId);
         if (otherUser == null) {
             throw new UserUnknownException("No user with id =" + otherId);
         }
@@ -102,7 +102,7 @@ public class UserService {
         HashSet<Long> intersection = new HashSet<>(user.getFriends().keySet());
         intersection.retainAll(otherUser.getFriends().keySet());
         return intersection.stream()
-                .map(friendId -> userStorage.getUserById(friendId))
+                .map(friendId -> userStorage.findUserById(friendId))
                 .collect(Collectors.toList());
     }
 }

@@ -61,7 +61,10 @@ public class MpaDbStorage implements MpaStorage {
             stmt.setString(2, mpa.getName());
             return stmt;
         }, keyHolder);
-        mpa.setId(keyHolder.getKey().longValue());
+
+        if (keyHolder.getKey() != null) {
+            mpa.setId(keyHolder.getKey().longValue());
+        }
         return mpa;
     }
 
@@ -95,7 +98,6 @@ public class MpaDbStorage implements MpaStorage {
         if (mpa.getName() == null) {
             log.info("Mpa: Валидация не пройдена: mpa имя не может быть пустым");
             mpa.setName("Unknown");
-//            throw new ValidationException("mpa имя не может быть пустым");
         }
 
         if (mpa.getId() < 0) {
