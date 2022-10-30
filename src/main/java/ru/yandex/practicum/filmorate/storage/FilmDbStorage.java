@@ -201,11 +201,6 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
 
-        log.info(String.format("Film.update %s with mpa_id %d and mpa_name %s"
-                , film.getName()
-                , film.getMpa().getId()
-                , film.getMpa().getName()));
-
         validateFilm(film);
 
         String sqlFilms = "insert into films(name, description, duration, release_date) " +
@@ -223,10 +218,7 @@ public class FilmDbStorage implements FilmStorage {
         }, keyHolder);
         film.setId(keyHolder.getKey().longValue());
 
-
-//        updateGenres(film);
         updateFilmGenres(film);
-//        updateMpa(film);
         updateFilmMpas(film);
         updateFilmLikes(film);
 
@@ -257,9 +249,7 @@ public class FilmDbStorage implements FilmStorage {
                 , java.sql.Date.valueOf(film.getReleaseDate())
                 , film.getId());
 
-//        updateGenres(film);
         updateFilmGenres(film);
-//        updateMpa(film);
         updateFilmMpas(film);
         updateFilmLikes(film);
 
