@@ -8,10 +8,10 @@ import java.util.List;
 public interface GenreStorage {
 
     // Return list of all genres
-    public List<Genre> getAll();
+    public List<Genre> findAll();
 
     // Return genre by id
-    public Genre getById(long id);
+    public Genre findById(long id);
 
     // Create a new genre
     public Genre create(Genre genre);

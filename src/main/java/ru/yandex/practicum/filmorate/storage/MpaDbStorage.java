@@ -6,13 +6,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -38,8 +36,13 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa findById(long id) {
+
         String getByIdSql = "select * from mpas where mpa_id = ?";
-        return jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id).get(0);
+        List<Mpa> mpas = jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id);
+        if (mpas.size() > 0) {
+            return jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id).get(0);
+        }
+        return null;
     }
 
     @Override
@@ -91,7 +94,8 @@ public class MpaDbStorage implements MpaStorage {
 
         if (mpa.getName() == null) {
             log.info("Mpa: Валидация не пройдена: mpa имя не может быть пустым");
-            throw new ValidationException("mpa имя не может быть пустым");
+            mpa.setName("Unknown");
+//            throw new ValidationException("mpa имя не может быть пустым");
         }
 
         if (mpa.getId() < 0) {

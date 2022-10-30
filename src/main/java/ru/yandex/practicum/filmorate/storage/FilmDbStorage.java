@@ -190,7 +190,7 @@ public class FilmDbStorage implements FilmStorage {
 
         updateGenres(film);
         updateFilmGenres(film);
-//        updateMpa(film);
+        updateMpa(film);
         updateFilmMpas(film);
         updateFilmLikes(film);
 
