@@ -30,14 +30,14 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public List<Mpa> findAll() {
-        String getAllSql = "select * from mpas";
+        String getAllSql = "select * from mpas order by mpa_id";
         return jdbcTemplate.query(getAllSql, (rs, rowNum) -> queryMpa(rs));
     }
 
     @Override
     public Mpa findById(long id) {
 
-        String getByIdSql = "select * from mpas where mpa_id = ?";
+        String getByIdSql = "select * from mpas where mpa_id = ? order by mpa_id";
         List<Mpa> mpas = jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id);
         if (mpas.size() > 0) {
             return jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id).get(0);
