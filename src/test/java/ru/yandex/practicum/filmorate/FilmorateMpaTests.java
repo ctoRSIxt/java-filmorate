@@ -22,17 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FilmorateMpaTests {
     private final MpaDbStorage mpaStorage;
 
-    Mpa mpa1;
-    Mpa mpa2;
-
-    @BeforeEach
-    public void TestMpa() {
-        mpa1 = new Mpa(1, "G");
-        mpa2 = new Mpa(2, "PG");
-        mpaStorage.create(mpa1);
-        mpaStorage.create(mpa2);
-    }
-
     @Test
     public void testFindMpaById() {
         Mpa testMpa1 = mpaStorage.findById(1);
@@ -44,14 +33,14 @@ class FilmorateMpaTests {
     @Test
     public void testFindAllMpas() {
         List<Mpa> genres = mpaStorage.findAll();
-        assertThat(genres).hasSize(2);
+        assertThat(genres).hasSize(5);
     }
 
     @Test
     public void testUpdateMpa() {
         Mpa mpa = mpaStorage.findById(1);
 
-        String newName = "NC-17";
+        String newName = "NC-175";
         mpa.setName(newName);
         mpaStorage.update(mpa);
         Mpa updatedMpa = mpaStorage.findById(1);

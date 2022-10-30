@@ -200,7 +200,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        
         if (film.getMpa() == null) {
             throw new ValidationException("mpa рейтинг не может быть пустым");
         };

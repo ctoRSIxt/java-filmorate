@@ -23,18 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FilmorateGenreTests {
     private final GenreDbStorage genreStorage;
 
-    Genre genre1;
-    Genre genre2;
-
-    @BeforeEach
-    public void TestGenre() {
-        genre1 = new Genre(1, "Комедия");
-        genre2 = new Genre(2, "Драма");
-        genreStorage.create(genre1);
-        genreStorage.create(genre2);
-
-    }
-
     @Test
     public void testFindGenreById() {
         Genre testGenre1 = genreStorage.findById(1);
@@ -46,7 +34,7 @@ class FilmorateGenreTests {
     @Test
     public void testFindAllGenres() {
         List<Genre> genres = genreStorage.findAll();
-        assertThat(genres).hasSize(2);
+        assertThat(genres).hasSize(6);
     }
 
     @Test
