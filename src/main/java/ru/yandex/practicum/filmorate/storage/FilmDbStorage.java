@@ -16,10 +16,8 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
-@Slf4j
 @Component("FilmDbStorage")
 @Primary
 public class FilmDbStorage implements FilmStorage {
@@ -74,8 +72,6 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException("mpa рейтинг не может быть пустым");
         };
 
-        validateFilm(film);
-
         String sqlFilms = "insert into films(name, description, duration, release_date) " +
                 "values (?, ?, ?, ?)";
 
@@ -100,8 +96,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-
-        validateFilm(film);
 
         String sql = "select * from films where film_id = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, film.getId());
@@ -295,31 +289,6 @@ public class FilmDbStorage implements FilmStorage {
     private void removeLike(Long filmId, Long userId) {
         String sqlRemLike = "delete from film_likes where film_id = ? and user_id = ?";
         jdbcTemplate.update(sqlRemLike, filmId, userId);
-    }
-
-
-    private void validateFilm(Film film) {
-
-        if (film.getName().isBlank()) {
-            log.info("Film: Валидация не пройдена: пустое назание");
-            throw new ValidationException("Название не может быть пустым.");
-        }
-
-        if (film.getDescription().length() > 200) {
-            log.info("Film: Валидация не пройдена: описание длиннее 200 символов");
-            throw new ValidationException("Максимальная длина описание 200 символов.");
-        }
-
-        LocalDate firstRelease = LocalDate.of(1895, 12, 28);
-        if (film.getReleaseDate().isBefore(firstRelease)) {
-            log.info("Film: Валидация не пройдена: дата релиза раньше 28.12.1895");
-            throw new ValidationException("Выход фильма не может быть раньше 28.12.1895.");
-        }
-
-        if (film.getDuration() < 0) {
-            log.info("Film: Валидация не пройдена: продолжительность фильма отрицательна");
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
     }
 
 }

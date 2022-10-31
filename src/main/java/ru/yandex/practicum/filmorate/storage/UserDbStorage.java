@@ -14,12 +14,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Component("UserDbStorage")
 @Primary
 public class UserDbStorage implements UserStorage {
@@ -62,9 +60,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-
-        validateUser(user);
-
         String sqlUsers = "insert into users(email, login, name, birthday) " +
                 "values (?, ?, ?, ?)";
 
@@ -85,8 +80,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-
-        validateUser(user);
 
         String sql = "select * from users where user_id = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, user.getId());
@@ -159,27 +152,4 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sqlRemFriends, userId, friendId);
     }
 
-
-    private void validateUser(User user) {
-
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.info("User: Валидация не пройдена: email пуст или не содержит @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать @");
-        }
-
-        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.info("User: Валидация не пройдена: логин пуст или содержит пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
-        }
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("User: Имя пользователя пустое: будет использоваться логин");
-            user.setName(user.getLogin());
-        }
-
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("User: Валидация не пройдена: дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-    }
 }
