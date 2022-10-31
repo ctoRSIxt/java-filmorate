@@ -30,6 +30,100 @@ public class FilmDbStorage implements FilmStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
+    public List<Film> findAll() {
+        String sql = "select * from films";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> queryFilm(rs));
+    };
+
+    @Override
+    public Film findFilmById(long id) {
+        String sql = "select * from films where film_id = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
+
+        if(filmRows.next()) {
+            Film film = new Film(filmRows.getLong("film_id")
+                    ,filmRows.getString("name")
+                    ,filmRows.getString("description")
+                    ,filmRows.getInt("duration")
+                    ,filmRows.getDate("release_date").toLocalDate()
+                    ,null, new ArrayList<>(), new HashSet<>());
+
+            film.setLikes(new HashSet<>(getLikes(film.getId())));
+            film.setGenres(getGenres(film.getId()));
+            film.setMpa(getMpa(film.getId()));
+
+            return film;
+        } else {
+            return null;
+        }
+
+    };
+
+    @Override
+    public Film create(Film film) {
+        if (film.getMpa() == null) {
+            throw new ValidationException("mpa рейтинг не может быть пустым");
+        };
+
+        validateFilm(film);
+
+        String sqlFilms = "insert into films(name, description, duration, release_date) " +
+                "values (?, ?, ?, ?)";
+
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlFilms, new String[]{"film_id"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2, film.getDescription());
+            stmt.setInt(3, film.getDuration());
+            stmt.setDate(4, java.sql.Date.valueOf(film.getReleaseDate()));
+            return stmt;
+        }, keyHolder);
+        film.setId(keyHolder.getKey().longValue());
+
+        updateFilmGenres(film);
+        updateFilmMpas(film);
+        updateFilmLikes(film);
+
+        return film;
+    };
+
+    @Override
+    public Film update(Film film) {
+
+        validateFilm(film);
+
+        String sql = "select * from films where film_id = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, film.getId());
+
+        if (!filmRows.next()) {
+            throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
+        }
+
+
+        String sqlFilmUpdate = "update films set " +
+                "name = ?, description = ?, duration = ?, " +
+                "release_date = ?" +
+                "where film_id = ?";
+        jdbcTemplate.update(sqlFilmUpdate
+                , film.getName()
+                , film.getDescription()
+                , film.getDuration()
+                , java.sql.Date.valueOf(film.getReleaseDate())
+                , film.getId());
+
+        updateFilmGenres(film);
+        updateFilmMpas(film);
+        updateFilmLikes(film);
+
+
+        return film;
+
+    };
+
+
     private Film queryFilm(ResultSet rs) throws SQLException {
         Film film = new Film(rs.getLong("film_id")
                         ,rs.getString("name")
@@ -196,101 +290,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
-
-    @Override
-    public List<Film> findAll() {
-        String sql = "select * from films";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> queryFilm(rs));
-    };
-
-    @Override
-    public Film findFilmById(long id) {
-        String sql = "select * from films where film_id = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
-
-        if(filmRows.next()) {
-            Film film = new Film(filmRows.getLong("film_id")
-                    ,filmRows.getString("name")
-                    ,filmRows.getString("description")
-                    ,filmRows.getInt("duration")
-                    ,filmRows.getDate("release_date").toLocalDate()
-                    ,null, new ArrayList<>(), new HashSet<>());
-
-            film.setLikes(new HashSet<>(getLikes(film.getId())));
-            film.setGenres(getGenres(film.getId()));
-            film.setMpa(getMpa(film.getId()));
-
-            return film;
-        } else {
-            return null;
-        }
-
-    };
-
-    @Override
-    public Film create(Film film) {
-        if (film.getMpa() == null) {
-            throw new ValidationException("mpa рейтинг не может быть пустым");
-        };
-
-        validateFilm(film);
-
-        String sqlFilms = "insert into films(name, description, duration, release_date) " +
-                "values (?, ?, ?, ?)";
-
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlFilms, new String[]{"film_id"});
-            stmt.setString(1, film.getName());
-            stmt.setString(2, film.getDescription());
-            stmt.setInt(3, film.getDuration());
-            stmt.setDate(4, java.sql.Date.valueOf(film.getReleaseDate()));
-            return stmt;
-        }, keyHolder);
-        film.setId(keyHolder.getKey().longValue());
-
-        updateFilmGenres(film);
-        updateFilmMpas(film);
-        updateFilmLikes(film);
-
-        return film;
-    };
-
-    @Override
-    public Film update(Film film) {
-
-        validateFilm(film);
-
-        String sql = "select * from films where film_id = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, film.getId());
-
-        if (!filmRows.next()) {
-            throw new FilmUnknownException("Фильм с id = " + film.getId() + " не известен.");
-        }
-
-
-        String sqlFilmUpdate = "update films set " +
-                "name = ?, description = ?, duration = ?, " +
-                "release_date = ?" +
-                "where film_id = ?";
-        jdbcTemplate.update(sqlFilmUpdate
-                , film.getName()
-                , film.getDescription()
-                , film.getDuration()
-                , java.sql.Date.valueOf(film.getReleaseDate())
-                , film.getId());
-
-        updateFilmGenres(film);
-        updateFilmMpas(film);
-        updateFilmLikes(film);
-
-
-        return film;
-
-    };
-
-
     private void validateFilm(Film film) {
 
         if (film.getName().isBlank()) {
@@ -313,7 +312,6 @@ public class FilmDbStorage implements FilmStorage {
             log.info("Film: Валидация не пройдена: продолжительность фильма отрицательна");
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
         }
-
     }
 
 }

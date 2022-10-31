@@ -30,54 +30,6 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private User queryUser(ResultSet rs) throws SQLException {
-        User user = new User(rs.getLong("user_id")
-                ,rs.getString("email")
-                ,rs.getString("login")
-                ,rs.getString("name")
-                ,rs.getDate("birthday").toLocalDate());
-
-        user.setFriends(getFriends(user.getId()));
-        return user;
-    }
-
-    private Map<Long, Boolean> getFriends(long user_id) {
-        String sql = "select * from user_friendship where user_id = ?";
-        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet(sql, user_id);
-
-        Map<Long, Boolean> friends = new HashMap<>();
-        while (friendsRows.next()) {
-            friends.put(friendsRows.getLong("friend_id"),
-                        friendsRows.getBoolean("accepted"));
-        }
-        return friends;
-    }
-
-    private void updateFriends(User user) {
-        String sqlInsFriends = "update user_friendship SET accepted=? where user_id = ? and friend_id = ?;"+
-                "insert into user_friendship(user_id, friend_id, accepted)" +
-                "select ?, ?, ?" +
-                "where not exists (select 1 from user_friendship where user_id = ? and friend_id = ?)";
-        for (Long friendId : user.getFriends().keySet()) {
-            long userId = user.getId();
-            boolean ac = user.getFriends().get(friendId);
-            jdbcTemplate.update(sqlInsFriends
-                    ,ac, userId, friendId
-                    ,userId, friendId, ac
-                    ,userId, friendId);
-        }
-
-        for (Long dbFriend : getFriends(user.getId()).keySet()) {
-            if (!user.getFriends().containsKey(dbFriend)) {
-                removeFriend(user.getId(), dbFriend);
-            }
-        }
-    }
-
-    private void removeFriend(Long userId, Long friendId) {
-        String sqlRemFriends = "delete from user_friendship where user_id = ? and friend_id = ?";
-        jdbcTemplate.update(sqlRemFriends, userId, friendId);
-    }
 
     @Override
     public List<User> findAll() {
@@ -158,7 +110,55 @@ public class UserDbStorage implements UserStorage {
         return user;
     };
 
+    private User queryUser(ResultSet rs) throws SQLException {
+        User user = new User(rs.getLong("user_id")
+                ,rs.getString("email")
+                ,rs.getString("login")
+                ,rs.getString("name")
+                ,rs.getDate("birthday").toLocalDate());
 
+        user.setFriends(getFriends(user.getId()));
+        return user;
+    }
+
+    private Map<Long, Boolean> getFriends(long user_id) {
+        String sql = "select * from user_friendship where user_id = ?";
+        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet(sql, user_id);
+
+        Map<Long, Boolean> friends = new HashMap<>();
+        while (friendsRows.next()) {
+            friends.put(friendsRows.getLong("friend_id"),
+                        friendsRows.getBoolean("accepted"));
+        }
+        return friends;
+    }
+
+    private void updateFriends(User user) {
+        String sqlInsFriends = "update user_friendship SET accepted=? where user_id = ? and friend_id = ?;"+
+                "insert into user_friendship(user_id, friend_id, accepted)" +
+                "select ?, ?, ?" +
+                "where not exists (select 1 from user_friendship where user_id = ? and friend_id = ?)";
+        for (Long friendId : user.getFriends().keySet()) {
+            long userId = user.getId();
+            boolean ac = user.getFriends().get(friendId);
+            jdbcTemplate.update(sqlInsFriends
+                    ,ac, userId, friendId
+                    ,userId, friendId, ac
+                    ,userId, friendId);
+        }
+
+        for (Long dbFriend : getFriends(user.getId()).keySet()) {
+            if (!user.getFriends().containsKey(dbFriend)) {
+                removeFriend(user.getId(), dbFriend);
+            }
+        }
+    }
+
+    private void removeFriend(Long userId, Long friendId) {
+        String sqlRemFriends = "delete from user_friendship where user_id = ? and friend_id = ?";
+        jdbcTemplate.update(sqlRemFriends, userId, friendId);
+    }
+    
 
     private void validateUser(User user) {
 
