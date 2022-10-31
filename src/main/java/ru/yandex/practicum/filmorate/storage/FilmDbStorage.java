@@ -38,7 +38,14 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findFilmById(long id) {
-        String sql = "select * from films where film_id = ?";
+        String sql = "select f.film_id as film_id, f.name as name, f.description as description, " +
+                "f.duration as duration, f.release_date as release_date, " +
+                "m.mpa_id as mpa_id, m.mpa_name as mpa_name from films as f " +
+                "left outer join film_mpas as fm on fm.film_id = f.film_id " +
+                "left outer join mpas as m on fm.mpa_id = m.mpa_id " +
+                "where f.film_id = ?";
+
+
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
 
         if(filmRows.next()) {
@@ -49,9 +56,10 @@ public class FilmDbStorage implements FilmStorage {
                     ,filmRows.getDate("release_date").toLocalDate()
                     ,null, new ArrayList<>(), new HashSet<>());
 
+            Mpa mpa = new Mpa(filmRows.getLong("mpa_id"), filmRows.getString("mpa_name"));
             film.setLikes(new HashSet<>(getLikes(film.getId())));
             film.setGenres(getGenres(film.getId()));
-            film.setMpa(getMpa(film.getId()));
+            film.setMpa(mpa);
 
             return film;
         } else {

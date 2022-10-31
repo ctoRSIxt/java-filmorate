@@ -158,7 +158,7 @@ public class UserDbStorage implements UserStorage {
         String sqlRemFriends = "delete from user_friendship where user_id = ? and friend_id = ?";
         jdbcTemplate.update(sqlRemFriends, userId, friendId);
     }
-    
+
 
     private void validateUser(User user) {
 
