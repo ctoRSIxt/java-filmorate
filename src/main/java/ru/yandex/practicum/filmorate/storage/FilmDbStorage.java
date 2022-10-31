@@ -63,7 +63,7 @@ public class FilmDbStorage implements FilmStorage {
 
             return film;
         } else {
-            return null;
+            throw new FilmUnknownException("No film with id =" + id);
         }
 
     };

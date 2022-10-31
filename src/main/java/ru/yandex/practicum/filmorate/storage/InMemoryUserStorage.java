@@ -25,7 +25,11 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUserById(long id) {
-        return users.get(id);
+        User user = users.get(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id = " + id);
+        }
+        return user;
     }
 
     @Override

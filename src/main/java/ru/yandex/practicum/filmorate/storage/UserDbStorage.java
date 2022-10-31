@@ -54,7 +54,7 @@ public class UserDbStorage implements UserStorage {
             user.setFriends(getFriends(user.getId()));
             return user;
         } else {
-            return null;
+            throw new UserUnknownException("No user with id = " + id);
         }
 
     };
