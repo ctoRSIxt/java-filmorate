@@ -25,18 +25,10 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreStorage genreStorage;
-    private final MpaStorage mpaStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate
-                        , GenreStorage genreStorage
-                        , MpaStorage mpaStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.genreStorage = genreStorage;
-        this.mpaStorage = mpaStorage;
     }
-
-
 
     private Film queryFilm(ResultSet rs) throws SQLException {
         Film film = new Film(rs.getLong("film_id")
@@ -93,8 +85,23 @@ public class FilmDbStorage implements FilmStorage {
 
     private void updateGenres(Film film) {
         if (film.getGenres() != null) {
+
+            String sqlPutGenre = "insert into genres (genre_name)" +
+                    "select ?" +
+                    "where not exists (select 1 from genres where genre_name = ?)";
+
             for (Genre genre : film.getGenres()) {
-                genreStorage.create(genre);
+                KeyHolder keyHolder = new GeneratedKeyHolder();
+                jdbcTemplate.update(connection -> {
+                    PreparedStatement stmt = connection.prepareStatement(sqlPutGenre, new String[]{"genre_id"});
+                    stmt.setString(1, genre.getName());
+                    stmt.setString(2, genre.getName());
+                    return stmt;
+                }, keyHolder);
+
+                if (keyHolder.getKey() != null) {
+                    genre.setId(keyHolder.getKey().longValue());
+                }
             }
         }
     }
@@ -119,7 +126,22 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateMpa(Film film) {
-        mpaStorage.create(film.getMpa());
+        Mpa mpa = film.getMpa();
+        String sqlPut = "insert into mpas (mpa_name)" +
+                "select ?" +
+                "where not exists (select 1 from mpas where mpa_name = ?)";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlPut, new String[]{"mpa_id"});
+            stmt.setString(1, mpa.getName());
+            stmt.setString(2, mpa.getName());
+            return stmt;
+        }, keyHolder);
+
+        if (keyHolder.getKey() != null) {
+            mpa.setId(keyHolder.getKey().longValue());
+        }
     }
 
     private void updateFilmMpas(Film film) {
@@ -136,7 +158,14 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getId(), film.getMpa().getId());
 
 
-        film.setMpa(mpaStorage.findById(film.getMpa().getId()));
+        String getByIdSql = "select * from mpas where mpa_id = ? order by mpa_id";
+        List<Mpa> mpas = jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs)
+                , film.getMpa().getId());
+
+        if (mpas.size() > 0) {
+            film.setMpa(mpas.get(0));
+        }
+
     }
 
     private void updateFilmLikes(Film film) {
