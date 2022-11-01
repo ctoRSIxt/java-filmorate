@@ -51,18 +51,14 @@ public class FilmService {
     public Film addLike(long id, long userId) {
         Film film = filmStorage.findFilmById(id);
         User user = userStorage.findUserById(userId);
-
-        film.getLikes().add(user.getId());
-        filmStorage.update(film);
+        filmStorage.addLike(film, user);
         return film;
     }
 
     public Film removeLike(long id, long userId) {
         Film film = filmStorage.findFilmById(id);
         User user = userStorage.findUserById(userId);
-
-        film.getLikes().remove(user.getId());
-        filmStorage.update(film);
+        filmStorage.removeLike(film, user);
         return film;
     }
 

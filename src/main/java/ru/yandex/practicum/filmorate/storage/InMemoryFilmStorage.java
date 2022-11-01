@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmUnknownException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -53,6 +54,16 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         films.put(film.getId(), film);
         return film;
+    }
+
+    @Override
+    public void removeLike(Film film, User user) {
+        film.getLikes().remove(user.getId());
+    }
+
+    @Override
+    public void addLike(Film film, User user) {
+        film.getLikes().add(user.getId());
     }
 
 }

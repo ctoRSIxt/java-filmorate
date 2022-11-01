@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -289,6 +290,23 @@ public class FilmDbStorage implements FilmStorage {
     private void removeLike(Long filmId, Long userId) {
         String sqlRemLike = "delete from film_likes where film_id = ? and user_id = ?";
         jdbcTemplate.update(sqlRemLike, filmId, userId);
+    }
+
+    @Override
+    public void removeLike(Film film, User user) {
+        film.getLikes().remove(user.getId());
+        removeLike(film.getId(), user.getId());
+    }
+
+    @Override
+    public void addLike(Film film, User user) {
+        film.getLikes().add(user.getId());
+
+        String sqlInsFilmLikes = "insert into film_likes(film_id, user_id)" +
+                "select ?, ?" +
+                "where not exists (select 1 from film_likes where film_id = ? and user_id = ?)";
+        jdbcTemplate.update(sqlInsFilmLikes
+                , film.getId(), user.getId(), film.getId(), user.getId());
     }
 
 }

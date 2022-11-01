@@ -152,4 +152,27 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sqlRemFriends, userId, friendId);
     }
 
+    private void addFriend(Long userId, Long friendId) {
+        String sqlInsFriends = "insert into user_friendship(user_id, friend_id, accepted)" +
+                "select ?, ?, ?" +
+                "where not exists (select 1 from user_friendship where user_id = ? and friend_id = ?)";
+
+
+        jdbcTemplate.update(sqlInsFriends
+                ,userId, friendId, false
+                ,userId, friendId);
+    }
+
+    @Override
+    public void addFriend(User user, User friend) {
+        user.getFriends().put(friend.getId(), false);
+        addFriend(user.getId(), friend.getId());
+    }
+
+    @Override
+    public void removeFriend(User user, User friend) {
+        user.getFriends().remove(friend.getId());
+        removeFriend(user.getId(), friend.getId());
+    }
+
 }

@@ -43,22 +43,15 @@ public class UserService {
 
     public User addFriend(long id, long friendId) {
         User user = userStorage.findUserById(id);
-        User userToAdd = userStorage.findUserById(friendId);
-
-        user.getFriends().put(userToAdd.getId(), false);
-        userStorage.update(user);
-
+        User friend = userStorage.findUserById(friendId);
+        userStorage.addFriend(user, friend);
         return user;
     }
 
     public User removeFromFriends(long id, long friendId) {
         User user = userStorage.findUserById(id);
-        User userToRemove = userStorage.findUserById(friendId);
-
-        user.getFriends().remove(userToRemove.getId());
-        userStorage.update(user);
-        userToRemove.getFriends().remove(user.getId());
-        userStorage.update(user);
+        User friend = userStorage.findUserById(friendId);
+        userStorage.removeFriend(user, friend);
         return user;
     }
 

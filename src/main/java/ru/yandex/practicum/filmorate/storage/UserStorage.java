@@ -18,4 +18,10 @@ public interface UserStorage {
     // Update an existing user
     public User update(User user);
 
+    // Add friend
+    public void addFriend(User user, User friend);
+
+    // Remove friend
+    public void removeFriend(User user, User friend);
+
 }
