@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,10 +24,20 @@ class FilmorateMpaTests {
 
     @Test
     public void testFindMpaById() {
-        Mpa testMpa1 = mpaStorage.findById(1);
-        Mpa testMpa2 = mpaStorage.findById(2);
-        assertThat(testMpa1).hasFieldOrPropertyWithValue("name", "G");
-        assertThat(testMpa2).hasFieldOrPropertyWithValue("name", "PG");
+        Optional<Mpa> testMpa1 = mpaStorage.findById(1);
+        Optional<Mpa> testMpa2 = mpaStorage.findById(2);
+
+        assertThat(testMpa1)
+                .isPresent()
+                .hasValueSatisfying(mpa ->
+                        assertThat(mpa).hasFieldOrPropertyWithValue("name", "G")
+                );
+
+        assertThat(testMpa2)
+                .isPresent()
+                .hasValueSatisfying(mpa ->
+                        assertThat(mpa).hasFieldOrPropertyWithValue("name", "PG")
+                );
     }
 
     @Test
@@ -38,12 +48,17 @@ class FilmorateMpaTests {
 
     @Test
     public void testUpdateMpa() {
-        Mpa mpa = mpaStorage.findById(1);
+        Optional<Mpa> mpa = mpaStorage.findById(1);
 
         String newName = "NC-175";
-        mpa.setName(newName);
-        mpaStorage.update(mpa);
-        Mpa updatedMpa = mpaStorage.findById(1);
-        assertThat(updatedMpa).hasFieldOrPropertyWithValue("name", newName);
+        mpa.get().setName(newName);
+        mpaStorage.update(mpa.get());
+        Optional<Mpa> updatedMpa = mpaStorage.findById(1);
+
+        assertThat(updatedMpa)
+                .isPresent()
+                .hasValueSatisfying(mpa1 ->
+                        assertThat(mpa1).hasFieldOrPropertyWithValue("name", newName)
+                );
     }
 }

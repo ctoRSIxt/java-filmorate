@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MpaStorage {
 
@@ -11,7 +12,7 @@ public interface MpaStorage {
     public List<Mpa> findAll();
 
     // Return genre by id
-    public Mpa findById(long id);
+    public Optional<Mpa> findById(long id);
 
     // Create a new genre
     public Mpa create(Mpa mpa);

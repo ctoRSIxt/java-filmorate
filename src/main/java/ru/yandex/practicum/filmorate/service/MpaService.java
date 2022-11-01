@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MpaService {
@@ -22,13 +23,7 @@ public class MpaService {
         return mpaStorage.findAll();
     }
 
-    public Mpa findById(long mpaId) {
-
-        Mpa mpa = mpaStorage.findById(mpaId);
-        if (mpa == null) {
-            throw new MpaUnknownException("No mpa with id =" + mpaId);
-        }
-
-        return mpa;
+    public Optional<Mpa> findById(long mpaId) {
+        return mpaStorage.findById(mpaId);
     }
 }

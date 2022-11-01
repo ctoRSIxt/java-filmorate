@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,7 +69,7 @@ public class UserService {
         User user = userStorage.findUserById(id);
         User otherUser = userStorage.findUserById(otherId);
 
-        HashSet<Long> intersection = new HashSet<>(user.getFriends().keySet());
+        Set<Long> intersection = new HashSet<>(user.getFriends().keySet());
         intersection.retainAll(otherUser.getFriends().keySet());
         return intersection.stream()
                 .map(friendId -> userStorage.findUserById(friendId))

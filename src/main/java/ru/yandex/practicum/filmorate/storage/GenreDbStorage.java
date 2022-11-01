@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -32,15 +33,15 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Genre findById(long id) {
+    public Optional<Genre> findById(long id) {
         String getByIdSql = "select * from genres where genre_id = ? order by genre_id";
         List<Genre> genres = jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryGenre(rs), id);
 
         if (genres.size() > 0) {
-            return jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryGenre(rs), id).get(0);
+            return Optional.of(genres.get(0));
+        } else {
+            return Optional.empty();
         }
-
-        return null;
     }
 
     @Override

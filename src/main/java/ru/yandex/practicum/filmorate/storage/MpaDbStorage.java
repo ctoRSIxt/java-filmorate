@@ -5,13 +5,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -35,21 +35,18 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Mpa findById(long id) {
-
+    public Optional<Mpa> findById(long id) {
         String getByIdSql = "select * from mpas where mpa_id = ? order by mpa_id";
         List<Mpa> mpas = jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id);
         if (mpas.size() > 0) {
-            return jdbcTemplate.query(getByIdSql, (rs, rowNum) -> queryMpa(rs), id).get(0);
+            return Optional.of(mpas.get(0));
+        } else {
+            return Optional.empty();
         }
-        return null;
     }
 
     @Override
     public Mpa create(Mpa mpa) {
-
-        validateMpa(mpa);
-
         String sqlPut = "insert into mpas (mpa_name)" +
                 "select ?" +
                 "where not exists (select 1 from mpas where mpa_name = ?)";
@@ -70,9 +67,6 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa update(Mpa mpa) {
-
-        validateMpa(mpa);
-
         String sqlUpdate = "update mpas set mpa_name = ? where mpa_id = ?";
         jdbcTemplate.update(sqlUpdate
                 , mpa.getName()
@@ -86,25 +80,5 @@ public class MpaDbStorage implements MpaStorage {
         String removeSql = "delete from mpas where mpa_id = ?";
         jdbcTemplate.update(removeSql, mpa.getId());
     }
-
-    private void validateMpa(Mpa mpa) {
-
-        if (mpa == null) {
-            log.info("Mpa: Валидация не пройдена: возвращается null");
-            throw new ValidationException("mpa рейтинг не может быть пустым");
-
-        }
-
-        if (mpa.getName() == null) {
-            log.info("Mpa: Валидация не пройдена: mpa имя не может быть пустым");
-            mpa.setName("Unknown");
-        }
-
-        if (mpa.getId() < 0) {
-            log.info("Mpa: Валидация не пройдена: id не может быть отрицательным");
-            throw new ValidationException("id не может быть отрицательным");
-        }
-    }
-
 
 }
