@@ -24,16 +24,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(long id) {
-        return users.get(id);
+    public User findUserById(long id) {
+        User user = users.get(id);
+        if (user == null) {
+            throw new UserUnknownException("No user with id = " + id);
+        }
+        return user;
     }
 
     @Override
     public User create(User user) {
-
         log.info("Создание (post) записи для пользователя {}", user.getName());
-
-        validateUser(user);
 
         user.setId(++idCounter);
         users.put(user.getId(), user);
@@ -42,9 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-
         log.info("Редактирование (put) записи для пользователя {}", user.getName());
-        validateUser(user);
 
         if (!users.containsKey(user.getId())) {
             throw new UserUnknownException("Пользователь с id = " + user.getId() + " не известен.");
@@ -55,26 +54,15 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    private void validateUser(User user) {
 
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.info("User: Валидация не пройдена: email пуст или не содержит @");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать @");
-        }
-
-        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.info("User: Валидация не пройдена: логин пуст или содержит пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
-        }
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("User: Имя пользователя пустое: будет использоваться логин");
-            user.setName(user.getLogin());
-        }
-
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("User: Валидация не пройдена: дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
+    @Override
+    public void addFriend(User user, User friend) {
+        user.getFriends().put(friend.getId(), false);
     }
+
+    @Override
+    public void removeFriend(User user, User friend) {
+        user.getFriends().remove(friend.getId());
+    }
+
 }

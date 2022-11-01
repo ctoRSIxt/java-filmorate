@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,17 +35,20 @@ class FilmControllerValidationTest {
         film = new Film(1, "Фильм"
                 , "Описание"
                 , 120
-                , LocalDate.of(1999, 12, 1));
+                , LocalDate.of(1999, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
         film2 = new Film(2, "Фильм2"
                 , "Описание"
                 , 120
-                , LocalDate.of(1999, 12, 1));
+                , LocalDate.of(1999, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
         filmEmptyName = new Film(1, ""
                 , "Описание"
                 , 120
-                , LocalDate.of(1999, 12, 1));
+                , LocalDate.of(1999, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
         filmLongDescription = new Film(1, "Фильм"
                 , "Посмотрев 20 полнометражных фильмов " +
@@ -63,17 +67,20 @@ class FilmControllerValidationTest {
                 "которые выходили после 'Казино', стали развивать тему личных отношений и " +
                 "биографической истории персонажа в ущерб глобальным проектам агента Ноль Ноль Семь."
                 , 120
-                , LocalDate.of(1999, 12, 1));
+                , LocalDate.of(1999, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
         filmTooOld = new Film(1, "Фильм"
                 , "Описание"
                 , 120
-                , LocalDate.of(1888, 12, 1));
+                , LocalDate.of(1888, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
         filmNegativeDuration = new Film(1, "Фильм"
                 , "Описание"
                 , -30
-                , LocalDate.of(1999, 12, 1));
+                , LocalDate.of(1999, 12, 1)
+                ,null, new ArrayList<>(), new HashSet<>());
 
     }
 

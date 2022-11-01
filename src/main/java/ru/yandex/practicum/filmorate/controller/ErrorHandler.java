@@ -4,9 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exception.FilmUnknownException;
-import ru.yandex.practicum.filmorate.exception.UserUnknownException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.*;
 
 import java.util.Map;
 
@@ -19,7 +17,8 @@ public class ErrorHandler {
         return Map.of("ValidationException", e.getMessage());
     }
 
-    @ExceptionHandler({FilmUnknownException.class, UserUnknownException.class})
+    @ExceptionHandler({FilmUnknownException.class, UserUnknownException.class
+            , MpaUnknownException.class, GenreUnknownException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(final RuntimeException e) {
         return Map.of("ObjectNotFound", e.getMessage());

@@ -10,12 +10,18 @@ public interface UserStorage {
     public List<User> findAll();
 
     // Return user by id
-    public User getUserById(long id);
+    public User findUserById(long id);
 
     // Create a new user
     public User create(User user);
 
     // Update an existing user
     public User update(User user);
+
+    // Add friend
+    public void addFriend(User user, User friend);
+
+    // Remove friend
+    public void removeFriend(User user, User friend);
 
 }

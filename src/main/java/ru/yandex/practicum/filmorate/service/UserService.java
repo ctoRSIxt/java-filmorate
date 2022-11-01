@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserUnknownException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
     private UserStorage userStorage;
 
@@ -24,83 +29,74 @@ public class UserService {
     }
 
     public User findById(long userId) {
-
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            throw new UserUnknownException("No user with id =" + userId);
-        }
-
-        return user;
+        return userStorage.findUserById(userId);
     }
 
     public User create(User user) {
+        validateUser(user);
         return userStorage.create(user);
     }
 
     public User update(User user) {
+        validateUser(user);
         return userStorage.update(user);
     }
 
     public User addFriend(long id, long friendId) {
-
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new UserUnknownException("No user with id =" + id);
-        }
-        User userToAdd = userStorage.getUserById(friendId);
-        if (userToAdd == null) {
-            throw new UserUnknownException("No user with id =" + friendId);
-        }
-
-        user.getFriendsId().add(userToAdd.getId());
-        userToAdd.getFriendsId().add(user.getId());
-
+        User user = userStorage.findUserById(id);
+        User friend = userStorage.findUserById(friendId);
+        userStorage.addFriend(user, friend);
         return user;
     }
 
     public User removeFromFriends(long id, long friendId) {
-
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new UserUnknownException("No user with id =" + id);
-        }
-        User userToRemove = userStorage.getUserById(friendId);
-        if (userToRemove == null) {
-            throw new UserUnknownException("No user with id =" + friendId);
-        }
-
-        user.getFriendsId().remove(userToRemove.getId());
-        userToRemove.getFriendsId().remove(user.getId());
+        User user = userStorage.findUserById(id);
+        User friend = userStorage.findUserById(friendId);
+        userStorage.removeFriend(user, friend);
         return user;
     }
 
     public List<User> getAllFriends(long id) {
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new UserUnknownException("No user with id =" + id);
-        }
+        User user = userStorage.findUserById(id);
 
-        return user.getFriendsId().stream()
-                .map(friendId -> userStorage.getUserById(friendId))
+        return user.getFriends().keySet().stream()
+                .map(friendId -> userStorage.findUserById(friendId))
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long id, long otherId) {
 
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new UserUnknownException("No user with id =" + id);
-        }
+        User user = userStorage.findUserById(id);
+        User otherUser = userStorage.findUserById(otherId);
 
-        User otherUser = userStorage.getUserById(otherId);
-        if (otherUser == null) {
-            throw new UserUnknownException("No user with id =" + otherId);
-        }
-
-        HashSet<Long> intersection = new HashSet<>(user.getFriendsId());
-        intersection.retainAll(otherUser.getFriendsId());
+        Set<Long> intersection = new HashSet<>(user.getFriends().keySet());
+        intersection.retainAll(otherUser.getFriends().keySet());
         return intersection.stream()
-                .map(friendId -> userStorage.getUserById(friendId))
+                .map(friendId -> userStorage.findUserById(friendId))
                 .collect(Collectors.toList());
+    }
+
+
+    private void validateUser(User user) {
+
+        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            log.info("User: Валидация не пройдена: email пуст или не содержит @");
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать @");
+        }
+
+        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+            log.info("User: Валидация не пройдена: логин пуст или содержит пробелы");
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
+        }
+
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.info("User: Имя пользователя пустое: будет использоваться логин");
+            user.setName(user.getLogin());
+        }
+
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            log.info("User: Валидация не пройдена: дата рождения не может быть в будущем");
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
     }
 }
